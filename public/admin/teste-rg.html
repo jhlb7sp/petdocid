@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Teste RG</title>
+</head>
+<body>
+  <button id="btn">Gerar RG</button>
+  <br><br>
+  <img id="preview" style="max-width:100%; border:1px solid #ccc;" />
+
+  <script type="module">
+    import { generateRg } from "./rg-generator.js";
+
+    const pet = {
+      nome: "Trovão",
+      registro: "PD-000123",
+      fotoUrl: "./img/pet-exemplo.png" // coloque uma foto aí pra testar
+    };
+
+    document.getElementById("btn").onclick = async () => {
+      const png = await generateRg(pet, "./img/rgAzul.png");
+      document.getElementById("preview").src = png;
+    };
+  </script>
+</body>
+</html>

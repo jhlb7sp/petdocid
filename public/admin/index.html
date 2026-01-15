@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PetDoc ID</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+</head>
+
+<body>
+  <div class="bgGlow"></div>
+  <div class="wrap">
+
+    <header class="header">
+      <div class="logoArea">
+         <a class="btnlogo" href="/index.html"><img src="./img/logopetdocid.png" alt="PetDoc ID" class="logoImg"></a>
+      </div>
+
+      <nav class="tabs">
+        <button class="tab active" data-tab="consulta" type="button">Consulta</button>
+        <button class="tab" data-tab="cadastro" type="button">Cadastro</button>
+      </nav>
+    </header>
+
+    <!-- ===================== -->
+    <!-- CONSULTA -->
+    <!-- ===================== -->
+    <section class="panel active" id="panel-consulta">
+      <div class="card">
+        <div class="row">
+          <div>
+            <label for="fNome">Nome do pet</label>
+            <input id="fNome" placeholder="Ex: Trovão" />
+          </div>
+          <div>
+            <label for="fTutor">Tutor</label>
+            <input id="fTutor" placeholder="Ex: Jorge" />
+          </div>
+          <div>
+            <label for="fRaca">Raça</label>
+            <input id="fRaca" placeholder="Ex: Golden" />
+          </div>
+          <div class="actions">
+            <button id="btnBuscar" class="primary" type="button">Buscar</button>
+            <button id="btnLimpar" class="secondary" type="button">Limpar</button>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Registro</th>
+                <th>Nome</th>
+                <th>Tutor(es)</th>
+                <th>Raça</th>
+                <th>Espécie</th>
+                <th>Status</th>
+                <th>WhatsApp</th>
+                <th>Cor Docs</th>
+                <th class="colActions">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="grid"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== -->
+    <!-- CADASTRO -->
+    <!-- ===================== -->
+    <section class="panel" id="panel-cadastro">
+
+      <!-- card sem padding (pra barra colar no corpo) -->
+      <div class="card cardCadastro">
+
+        <!-- ===================== -->
+        <!-- BARRA (aba) -->
+        <!-- ===================== -->
+        <div class="cadastroBar">
+          <div class="cadastroBarLeft">
+
+            <div class="subtabs" role="tablist" aria-label="Cadastro">
+              <button class="subtab active" data-subtab="json" type="button" role="tab" aria-selected="true">
+                JSON
+              </button>
+              <button class="subtab" data-subtab="form" type="button" role="tab" aria-selected="false">
+                FORM
+              </button>
+            </div>
+
+            <div class="fileUpload">
+              <input id="cFoto" class="fileInput" type="file" accept="image/*" />
+              <label for="cFoto" class="fileBtn">Escolher foto</label>
+              <span id="fileName" class="fileName">Nenhuma foto selecionada</span>
+            </div>
+
+          </div>
+
+          <div class="cadastroBarRight">
+            <button id="btnGerarDocs" class="primary btnTop" type="button">Gerar Docs</button>
+            <button id="btnLimparCadastro" class="outline btnTop" type="button">LIMPAR</button>
+          </div>
+        </div>
+
+        <!-- ===================== -->
+        <!-- CORPO (QUADRO) -->
+        <!-- ===================== -->
+        <div class="cadastroBody">
+
+          <!-- ============ -->
+          <!-- FORM PANEL -->
+          <!-- ============ -->
+          <div id="subtab-form" class="subpanel" role="tabpanel" aria-label="Formulário">
+            <div class="formSectionTitle">📄 Dados do Pet</div>
+
+            <div class="grid3">
+              <div>
+                <label for="cNomePet">Nome do pet</label>
+                <input id="cNomePet" />
+              </div>
+
+              <div>
+                <label for="cEspecie">Espécie</label>
+                <select id="cEspecie">
+                  <option value="">Selecione</option>
+                  <option>Canino</option>
+                  <option>Felino</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="cRaca">Raça</label>
+                <input id="cRaca" />
+              </div>
+
+              <div>
+                <label for="cPelagemCor">Pelagem / Cor</label>
+                <input id="cPelagemCor" />
+              </div>
+
+              <div>
+                <label for="cDataNascimento">Data de nascimento</label>
+                <input id="cDataNascimento" placeholder="dd/mm/aaaa" />
+              </div>
+
+              <div>
+                <label for="cSexo">Sexo</label>
+                <select id="cSexo">
+                  <option value="">Selecione</option>
+                  <option>Macho</option>
+                  <option>Fêmea</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="cPorte">Porte</label>
+                <select id="cPorte">
+                  <option value="">Selecione</option>
+                  <option>Mini</option>
+                  <option>Pequeno</option>
+                  <option>Médio</option>
+                  <option>Grande</option>
+                  <option>Gigante</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="cCastrado">Castrado(a)?</label>
+                <select id="cCastrado">
+                  <option value="">Selecione</option>
+                  <option>Sim</option>
+                  <option>Não</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="cPedigree">Pedigree</label>
+                <select id="cPedigree">
+                  <option value="">Selecione</option>
+                  <option>Sim</option>
+                  <option>Não</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="cCidade">Cidade</label>
+                <input id="cCidade" />
+              </div>
+
+              <div>
+                <label for="cEstado">Estado (UF)</label>
+                <input id="cEstado" placeholder="SP" />
+              </div>
+
+              <div>
+                <label for="cCor">Cor dos documentos</label>
+                <select id="cCor">
+                  <option>Azul</option>
+                  <option>Rosa</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="formSectionTitle">👤 Tutores</div>
+
+            <div class="grid2">
+              <div>
+                <label for="cTutor1">Tutor(a) 1</label>
+                <input id="cTutor1" />
+              </div>
+              <div>
+                <label for="cTutor2">Tutor(a) 2 (opcional)</label>
+                <input id="cTutor2" />
+              </div>
+            </div>
+            <div class="grid2">
+              <div>
+                <label for="cTel1">Telefone 1</label>
+                <input id="cTel1" />
+              </div>
+              <div>
+                <label for="cTel2">Telefone 2 (opcional)</label>
+                <input id="cTel2" />
+              </div>
+            </div>
+
+            <div class="formSectionTitle">🔎 Outras informações</div>
+
+            <div class="grid2">
+              <div>
+                <label for="cMicrochip">Microchip (se tiver)</label>
+                <input id="cMicrochip" />
+              </div>
+              <div>
+                <label for="cInstagram">Instagram do pet (opcional)</label>
+                <input id="cInstagram" placeholder="@pet" />
+              </div>
+
+              <div class="span2">
+                <label for="cObservacoes">Sinais característicos / observações</label>
+                <textarea id="cObservacoes" placeholder="Ex: manchinhas, cicatriz, comportamento..."></textarea>
+              </div>
+
+              <div>
+                <label for="cEmail">Email</label>
+                <input id="cEmail" placeholder="opcional" />
+              </div>
+            </div>
+
+            <div class="row2">
+              <div class="hint" id="statusCad"></div>
+            </div>
+          </div>
+
+          <!-- ============ -->
+          <!-- JSON PANEL -->
+          <!-- ============ -->
+          <div id="subtab-json" class="subpanel active" role="tabpanel" aria-label="JSON">
+            <div class="jsonGrid">
+              <div class="jsonCol">
+                <label for="msgArea">Cole a msg do cliente</label>
+                <textarea id="msgArea" placeholder="Nome do pet: ..."></textarea>
+
+                <div class="actions">
+                  <button id="btnMsgToJson" class="secondary" type="button">Gerar JSON</button>
+                </div>
+
+                <div class="hint" id="statusMsg"></div>
+              </div>
+
+              <div class="jsonCol">
+                <label for="jsonArea">JSON do pet</label>
+                <textarea id="jsonArea" placeholder='{...}'></textarea>
+                <div class="hint" id="statusJson"></div>
+              </div>
+            </div>
+
+            <div class="hint">
+              Dica: Cole a mensagem na esquerda e clique <b>Gerar JSON</b> (ele preenche o JSON da direita).
+              Ou cole o JSON direto na direita e clique <b>Gerar Docs</b>.
+            </div>
+          </div>
+
+        </div><!-- /cadastroBody -->
+      </div><!-- /cardCadastro -->
+    </section>
+
+  </div>
+  <div id="cropModal" class="cropModal hidden">
+    <div class="cropCard">
+      <div class="cropHeader">
+        <strong>Ajuste a foto</strong>
+        <button id="cropClose" type="button">✖</button>
+      </div>
+
+      <div class="cropBody">
+        <div class="cropStage">
+          <img id="cropImage" alt="Recorte">
+        </div>
+
+        <div class="cropTools">
+          <button id="zoomOut" type="button">−</button>
+          <button id="zoomIn" type="button">+</button>
+          <button id="rotateLeft" type="button">⟲ 90°</button>
+          <button id="resetCrop" type="button">Reset</button>
+        </div>
+
+        <div class="cropHint">Arraste para posicionar • Use o scroll/+/− para zoom</div>
+      </div>
+
+      <div class="cropFooter">
+        <button id="cropConfirm" class="primary" type="button">Usar esta foto</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+
+  <script type="module" src="./app.js"></script>
+
+</body>
+
+</html>

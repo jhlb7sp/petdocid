@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PetDoc ID - Consulta</title>
+    <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+    <div class="bgGlow"></div>
+
+    <main class="wrap">
+        <header class="topbar">
+            <div class="brand">
+               <img src="./img/logo.png" alt="PetDoc ID" class="brandLogo" />
+                <div class="brandText">
+                    <h1>PetDoc ID</h1>
+                    <p>Consulta rápida para localizar o tutor</p>
+                </div>
+            </div>
+
+            <div class="badge">
+                <span class="dot"></span>
+                <span>Online</span>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="heroLeft">
+                <h2>Encontrou um pet?</h2>
+                <p class="sub">
+                    Digite o número do registro que está no documento/medalha e encontre
+                    o contato do tutor com segurança.
+                </p>
+
+                <div class="card searchCard">
+                    <label class="label" for="reg">Número do registro</label>
+
+                    <div class="row">
+                        <input id="reg" class="input" placeholder="Ex: SP-9999-999" autocomplete="off" />
+                        <button id="btnBuscar" class="btn">Buscar</button>
+                    </div>
+
+                    <!-- removido: Futuro / Dica -->
+
+                    <div id="status" class="status" aria-live="polite"></div>
+                </div>
+
+                <!-- RESULTADO (layout pronto) -->
+                <div id="result" class="result hidden">
+                    <div class="resultCard">
+                        <div class="resultHead">
+                            <span class="pill" id="petRegistro">Registro: —</span>
+                            <span class="help">Se o pet está com você, chame o tutor abaixo.</span>
+                        </div>
+
+                        <div class="resultBody">
+                            <img id="petFoto" class="petFoto" src="./img/kenai.jpeg" alt="Foto do pet" />
+
+                            <div class="petInfo">
+                                <h3 id="petNome">Nome do pet</h3>
+
+                                <div class="grid">
+                                    <div class="item">
+                                        <span class="k">Tutor</span>
+                                        <span class="v" id="tutorNome">—</span>
+                                    </div>
+
+                                    <div class="item">
+                                        <span class="k">Telefone</span>
+                                        <a class="v link" id="tutorTel" href="#" rel="nofollow">—</a>
+                                    </div>
+                                </div>
+
+                                <div class="ctaRow">
+                                    <a id="btnWhats" class="btnGhost" href="#" target="_blank" rel="nofollow noopener">
+                                        Chamar no WhatsApp
+                                    </a>
+                                    <button id="btnLimpar" class="btnSoft" type="button">
+                                        Limpar
+                                    </button>
+                                </div>
+
+                                <p class="small">
+                                    Para proteger a privacidade, exibimos apenas dados essenciais para contato.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <aside class="heroRight">
+                <div class="photoCard">
+                    <img id="petdocCarousel" alt="PetDoc ID" class="heroPhoto" />
+                    <div class="photoOverlay">
+                        <span class="miniPill">Seguro • Rápido • Profissional</span>
+                        <div class="photoTitle">Localize o tutor em segundos</div>
+                    </div>
+                </div>
+
+                <div class="miniCards">
+                    <div class="miniCard">
+                        <div class="miniTitle">Cadastre seu pet gratuitamente 🐾</div>
+                        <div class="miniDesc">
+                            Receba os documentos do seu pet e um registro para facilitar a localização caso ele se
+                            perca.
+                        </div>
+
+                        <a class="btnGhost" href="./cadastro.html">
+                            Quero cadastrar meu pet
+                        </a>
+
+                        <p class="small" style="margin-top:10px;">
+                            Após enviar, seu pedido entra como <strong>Pendente</strong> e você recebe os documentos
+                            quando estiverem prontos.
+                        </p>
+                    </div>
+                </div>
+            </aside>
+
+        </section>
+
+        <footer class="footer">
+            <span>© <span id="year"></span> PetDoc ID</span>
+            <span class="sep">•</span>
+            <span class="muted">Consulta pública de registro</span>
+        </footer>
+
+        <!-- MODAL ADMIN (hidden) -->
+        <div id="adminModal" class="modal hidden" aria-hidden="true">
+            <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+                <div class="modalHead">
+                    <strong id="adminTitle">Área do Administrador</strong>
+                    <button id="adminClose" class="modalClose" type="button" aria-label="Fechar">✕</button>
+                </div>
+
+                <div class="modalBody">
+                    <div class="field">
+                        <label class="label" for="adminUser">Login</label>
+                        <input id="adminUser" class="input" autocomplete="username" />
+                    </div>
+
+                    <div class="field" style="margin-top:10px;">
+                        <label class="label" for="adminPass">Senha</label>
+                        <input id="adminPass" class="input" type="password" autocomplete="current-password" />
+                    </div>
+
+                    <div id="adminStatus" class="status" aria-live="polite" style="margin-top:12px;"></div>
+
+                    <div class="ctaRow" style="margin-top:14px;">
+                        <button id="adminLoginBtn" class="btn" type="button">Entrar</button>
+                        <button id="adminCancelBtn" class="btnSoft" type="button">Cancelar</button>
+                    </div>
+
+                    <p class="small" style="margin-top:10px; opacity:.8;">
+                        Acesso restrito.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+    </main>
+
+    <script src="./app.js"></script>
+</body>
+
+</html>

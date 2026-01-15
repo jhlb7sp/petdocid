@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PetDoc ID - Cadastro</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+
+
+  <!-- CSS local só pra organizar o form (sem mexer no style.css agora) -->
+  <style>
+    .formCard {
+      padding: 18px;
+    }
+
+    .sectionTitle {
+      margin: 18px 0 10px;
+      font-weight: 700;
+      font-size: 14px;
+      opacity: .9;
+    }
+
+    .grid2,
+    .grid3 {
+      display: grid;
+      gap: 12px;
+    }
+
+    .grid2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .span2 {
+      grid-column: span 2;
+    }
+
+    .span3 {
+      grid-column: span 3;
+    }
+
+    .field .label {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* input file com cara melhor */
+    .fileBox {
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .04);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .fileRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .fileRow input[type="file"] {
+      max-width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .grid3 {
+        grid-template-columns: 1fr;
+      }
+
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+
+      .span2,
+      .span3 {
+        grid-column: auto;
+      }
+    }
+
+    /* ===== SELECT DARK MODE ===== */
+    select {
+      background-color: #0f1022;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* seta do select (Chrome / Edge) */
+    select option {
+      background-color: #1b1d3a;
+      color: #ffffff;
+    }
+
+    /* opção selecionada / hover */
+    select option:checked,
+    select option:hover {
+      background-color: #6d4bff;
+      color: #ffffff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bgGlow"></div>
+
+  <main class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <img src="./img/logo.png" alt="PetDoc ID" class="brandLogo" />
+        <div class="brandText">
+          <h1>PetDoc ID</h1>
+          <p>Cadastro para gerar documentos</p>
+        </div>
+      </div>
+
+      <a class="btnSoft" href="./index.html">Voltar</a>
+    </header>
+
+    <section class="hero" style="align-items:flex-start;">
+      <div class="heroLeft">
+        <h2>Cadastro do pet</h2>
+        <p class="sub">
+          Preencha os dados e envie uma foto. Seu pedido ficará como <strong>Pendente</strong> até a geração dos
+          documentos.
+        </p>
+
+        <div class="card formCard">
+          <form id="formCadastro" autocomplete="off">
+
+            <div class="sectionTitle">📄 Dados do Pet</div>
+
+            <div class="grid3">
+              <div class="field">
+                <label class="label" for="cNomePet">Nome do pet</label>
+                <input id="cNomePet" class="input" placeholder="Ex: Trovão" required />
+              </div>
+
+              <div class="field">
+                <label class="label" for="cEspecie">Espécie</label>
+                <select id="cEspecie" class="input" required>
+                  <option value="">Selecione</option>
+                  <option>Canino</option>
+                  <option>Felino</option>
+                  <option>Ave</option>
+                  <option>Outro</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="cRaca">Raça</label>
+                <input id="cRaca" class="input" placeholder="Ex: Golden Retriever" />
+              </div>
+
+              <div class="field">
+                <label class="label" for="cPelagemCor">Pelagem / Cor</label>
+                <input id="cPelagemCor" class="input" placeholder="Ex: Dourado claro" />
+              </div>
+
+              <div class="field">
+                <label class="label" for="cDataNascimento">Data de nascimento</label>
+                <input id="cDataNascimento" class="input" placeholder="dd/mm/aaaa" />
+              </div>
+
+              <div class="field">
+                <label class="label" for="cSexo">Sexo</label>
+                <select id="cSexo" class="input">
+                  <option value="">Selecione</option>
+                  <option>Macho</option>
+                  <option>Fêmea</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="cPorte">Porte</label>
+                <select id="cPorte" class="input">
+                  <option value="">Selecione</option>
+                  <option>Mini</option>
+                  <option>Pequeno</option>
+                  <option>Médio</option>
+                  <option>Grande</option>
+                  <option>Gigante</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="cCastrado">Castrado(a)?</label>
+                <select id="cCastrado" class="input">
+                  <option value="">Selecione</option>
+                  <option>Sim</option>
+                  <option>Não</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="cPedigree">Pedigree</label>
+                <select id="cPedigree" class="input">
+                  <option value="">Selecione</option>
+                  <option>Sim</option>
+                  <option>Não</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="cCidade">Cidade</label>
+                <input id="cCidade" class="input" placeholder="Ex: São Paulo" />
+              </div>
+
+              <div class="field">
+                <label class="label" for="cEstado">Estado (UF)</label>
+                <input id="cEstado" class="input" placeholder="SP" maxlength="2" />
+              </div>
+
+              <div class="field">
+                <label class="label" for="cCor">Cor dos documentos</label>
+                <select id="cCor" class="input">
+                  <option>Azul</option>
+                  <option>Rosa</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sectionTitle">👤 Tutores</div>
+
+            <div class="grid2">
+              <div class="field">
+                <label class="label" for="cTutor1">Tutor(a) 1</label>
+                <input id="cTutor1" class="input" placeholder="Nome do tutor" required />
+              </div>
+              <div class="field">
+                <label class="label" for="cTutor2">Tutor(a) 2 (opcional)</label>
+                <input id="cTutor2" class="input" placeholder="Nome do tutor 2" />
+              </div>
+            </div>
+
+            <div class="grid2" style="margin-top:12px;">
+              <div class="field">
+                <label class="label" for="cTel1">Telefone 1 (WhatsApp)</label>
+                <input id="cTel1" class="input" placeholder="(11) 99999-9999" required />
+              </div>
+              <div class="field">
+                <label class="label" for="cTel2">Telefone 2 (opcional)</label>
+                <input id="cTel2" class="input" placeholder="(11) 99999-9999" />
+              </div>
+            </div>
+
+            <div class="sectionTitle">🔎 Outras informações</div>
+
+            <div class="grid2">
+              <div class="field">
+                <label class="label" for="cMicrochip">Microchip (se tiver)</label>
+                <input id="cMicrochip" class="input" placeholder="Código do microchip" />
+              </div>
+
+              <div class="field">
+                <label class="label" for="cInstagram">Instagram do pet (opcional)</label>
+                <input id="cInstagram" class="input" placeholder="@pet" />
+              </div>
+
+              <div class="field span2">
+                <label class="label" for="cObservacoes">Sinais característicos / observações</label>
+                <textarea id="cObservacoes" class="input" style="min-height:110px;"
+                  placeholder="Ex: manchinhas, cicatriz, comportamento..."></textarea>
+              </div>
+
+              <div class="field">
+                <label class="label" for="cEmail">Email (opcional)</label>
+                <input id="cEmail" class="input" placeholder="se quiser receber também por e-mail" />
+              </div>
+            </div>
+
+            <div class="sectionTitle">📸 Foto do Pet</div>
+
+            <div class="fileBox">
+              <div class="fileRow">
+                <input id="cFoto" type="file" accept="image/*" />
+                <span class="small" id="fileName" style="opacity:.85;">Nenhuma foto selecionada</span>
+              </div>
+              <p class="small" style="margin-top:10px;">
+                Envie uma foto nítida do pet (rosto ou corpo inteiro). Isso ajuda na identificação e nos documentos.
+              </p>
+            </div>
+
+            <div class="ctaRow" style="margin-top:14px;">
+              <button class="btn" type="submit" id="btnEnviar">Enviar cadastro</button>
+              <button class="btnSoft" type="button" id="btnLimparCad">Limpar</button>
+            </div>
+
+            <div id="cadStatus" class="status" aria-live="polite" style="margin-top:12px;"></div>
+
+          </form>
+        </div>
+      </div>
+
+      <aside class="heroRight">
+        <div class="miniCards">
+          <div class="miniCard">
+            <div class="miniTitle">O que acontece depois?</div>
+            <div class="miniDesc">
+              Seu pedido entra como <strong>Pendente</strong> no nosso painel. Assim que os documentos estiverem
+              prontos,
+              você recebe via WhatsApp.
+            </div>
+          </div>
+          <div class="miniCard">
+            <div class="miniTitle">Privacidade</div>
+            <div class="miniDesc">
+              Na consulta pública exibimos apenas dados essenciais para contato do tutor.
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="footer">
+      <span>© <span id="year"></span> PetDoc ID</span>
+      <span class="sep">•</span>
+      <span class="muted">Cadastro de pet</span>
+    </footer>
+
+    <!-- MODAL ADMIN (hidden) -->
+    <div id="adminModal" class="modal hidden" aria-hidden="true">
+      <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+        <div class="modalHead">
+          <strong id="adminTitle">Área do Administrador</strong>
+          <button id="adminClose" class="modalClose" type="button" aria-label="Fechar">✕</button>
+        </div>
+
+        <div class="modalBody">
+          <div class="field">
+            <label class="label" for="adminUser">Login</label>
+            <input id="adminUser" class="input" autocomplete="username" />
+          </div>
+
+          <div class="field" style="margin-top:10px;">
+            <label class="label" for="adminPass">Senha</label>
+            <input id="adminPass" class="input" type="password" autocomplete="current-password" />
+          </div>
+
+          <div id="adminStatus" class="status" aria-live="polite" style="margin-top:12px;"></div>
+
+          <div class="ctaRow" style="margin-top:14px;">
+            <button id="adminLoginBtn" class="btn" type="button">Entrar</button>
+            <button id="adminCancelBtn" class="btnSoft" type="button">Cancelar</button>
+          </div>
+
+          <p class="small" style="margin-top:10px; opacity:.8;">
+            Acesso restrito.
+          </p>
+        </div>
+      </div>
+    </div>
+
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+  <script type="module" src="./cadastro.js"></script>
+
+</body>
+
+</html>
