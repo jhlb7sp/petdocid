@@ -256,38 +256,59 @@ function buildDocsPreview(docs) {
 }
 
 
-function downloadDocsPdfs(docs, petForDocs) {
-  const safeName = String(petForDocs?.nomePet || "Pet")
-    .replace(/[^\w\-]+/g, "_");
+async function downloadDocsPdfs(docs, petForDocs) {
+  const safeName = String(petForDocs?.nomePet || "Pet").replace(/[^\w\-]+/g, "_");
 
   const pages = [];
 
-  // RG (tamanho RG)
-  if (docs.rgCanvas instanceof HTMLCanvasElement) {
-    pages.push({ canvas: docs.rgCanvas, preset: "rg" });
-  }
+  if (docs.rgCanvas instanceof HTMLCanvasElement) pages.push({ canvas: docs.rgCanvas, preset: "rg" });
+  if (docs.certCanvas instanceof HTMLCanvasElement) pages.push({ canvas: docs.certCanvas, preset: "a4-portrait" });
 
-  // Certidão (A4 retrato)
-  if (docs.certCanvas instanceof HTMLCanvasElement) {
-    pages.push({ canvas: docs.certCanvas, preset: "a4-portrait" });
-  }
-
-  // Vacina (A4 paisagem)
   const v = docs.vacinaResult;
-  if (v?.frente instanceof HTMLCanvasElement) {
-    pages.push({ canvas: v.frente, preset: "a4-landscape" });
-  }
-  if (v?.verso instanceof HTMLCanvasElement) {
-    pages.push({ canvas: v.verso, preset: "a4-landscape" });
-  }
+  if (v?.frente instanceof HTMLCanvasElement) pages.push({ canvas: v.frente, preset: "a4-landscape" });
+  if (v?.verso instanceof HTMLCanvasElement) pages.push({ canvas: v.verso, preset: "a4-landscape" });
 
   if (!pages.length) {
     console.warn("Nenhuma página válida para gerar PDF único.");
     return;
   }
 
-  canvasesToSinglePdf(pages, `PetDoc_${safeName}.pdf`);
+  await canvasesToSinglePdf(pages, `PetDoc_${safeName}.pdf`, {
+    registro: petForDocs?.registro,
+    qrUrl: `https://petdocid.onrender.com/${encodeURIComponent(petForDocs?.registro || "")}`,
+  });
 }
+
+
+function generateQRCodeDataUrl(text, size = 180) {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  // qrcode-generator expõe a função global "qrcode"
+  const qr = qrcode(0, "M");
+  qr.addData(text);
+  qr.make();
+
+  const count = qr.getModuleCount();
+  const scale = size / count;
+
+  canvas.width = canvas.height = size;
+
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, size, size);
+
+  ctx.fillStyle = "#000";
+  for (let r = 0; r < count; r++) {
+    for (let c = 0; c < count; c++) {
+      if (qr.isDark(r, c)) {
+        ctx.fillRect(c * scale, r * scale, scale, scale);
+      }
+    }
+  }
+
+  return canvas.toDataURL("image/png");
+}
+
 
 
 async function handleGenerateFlow(petForDocs, { updateStatusId = null } = {}) {
@@ -312,9 +333,15 @@ async function handleGenerateFlow(petForDocs, { updateStatusId = null } = {}) {
     certPng: docsPreview.certPng,
     vacinaResult: docsPreview.vacinaResult,
   });
+  // 5.1 QR (pra mostrar no preview)
+  const registro = (petForDocs?.registro || "").toString().trim().toUpperCase();
+  const qrUrl = `https://petdocid.onrender.com/?registro=${encodeURIComponent(registro)}`;
+  const qrPng = generateQRCodeDataUrl(qrUrl, 220);
 
-  // 6) preview
-  openPreviewTab(docsPreview, instaPng);
+  // 5.2 abre preview com QR
+  openPreviewTab(docsPreview, instaPng, { qrPng, qrUrl, registro });
+
+  // 6) preview   openPreviewTab(docsPreview, instaPng);
 
   // 7) status pronto (somente quando veio da consulta)
   if (updateStatusId) {
@@ -685,7 +712,7 @@ function clearCadastroAll() {
   window.__editingPetId = null;
   window.__editingPhotoUrl = "";
   window.__hasExistingPhoto = false;
-  
+
   cNomePet.value = "";
   cEspecie.value = "";
   cRaca.value = "";
@@ -1009,7 +1036,51 @@ function parseMsgToJsonWithWarnings(text) {
 
   return { data: out, warnings };
 }
-function openPreviewTab(docs, instaPng) {
+// function openPreviewTab(docs, instaPng) {
+//   const w = window.open("", "_blank");
+//   if (!w) {
+//     alert("Seu navegador bloqueou o pop-up. Permita pop-ups para este site.");
+//     return;
+//   }
+
+//   const html = `
+// <!doctype html>
+// <html lang="pt-BR">
+// <head>
+//   <meta charset="utf-8" />
+//   <meta name="viewport" content="width=device-width,initial-scale=1" />
+//   <title>Preview - PetDoc ID</title>
+//   <style>
+//     body{margin:0;font-family:Arial;background:#f4f5f7;color:#111;}
+//     header{position:sticky;top:0;background:#fff;border-bottom:1px solid #ddd;padding:12px 16px;display:flex;gap:8px;align-items:center;z-index:10}
+//     .btn{border:1px solid #ccc;background:#fff;padding:8px 10px;border-radius:10px;cursor:pointer}
+//     .btn.primary{background:#2b5bff;color:#fff;border-color:#2b5bff}
+//     .wrap{max-width:980px;margin:16px auto;padding:0 16px}
+//     .card{background:#fff;border:1px solid #ddd;border-radius:14px;padding:12px;margin:14px 0}
+//     .title{font-weight:800;margin:0 0 10px}
+//     img{width:100%;height:auto;border:1px solid #eee;border-radius:12px}
+//     .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+//   </style>
+// </head>
+// <body>
+// <header>
+//   <button class="btn" onclick="window.close()">Fechar</button>
+//   <button class="btn primary" onclick="window.print()">Imprimir</button>
+// </header>
+
+// <div class="wrap">
+//   ${renderDocsHtml(docs, instaPng)}
+// </div>
+
+// </body>
+// </html>`;
+
+//   w.document.open();
+//   w.document.write(html);
+//   w.document.close();
+// }
+
+function openPreviewTab(docs, instaPng, qr = null) {
   const w = window.open("", "_blank");
   if (!w) {
     alert("Seu navegador bloqueou o pop-up. Permita pop-ups para este site.");
@@ -1032,7 +1103,9 @@ function openPreviewTab(docs, instaPng) {
     .card{background:#fff;border:1px solid #ddd;border-radius:14px;padding:12px;margin:14px 0}
     .title{font-weight:800;margin:0 0 10px}
     img{width:100%;height:auto;border:1px solid #eee;border-radius:12px}
-    .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .qrBox{display:flex;justify-content:center;align-items:center;padding:10px 0}
+    .qrImg{width:220px;height:220px;border-radius:12px}
+    .qrText{font-size:12px;color:#555;text-align:center;margin-top:8px;word-break:break-all}
   </style>
 </head>
 <body>
@@ -1042,7 +1115,7 @@ function openPreviewTab(docs, instaPng) {
 </header>
 
 <div class="wrap">
-  ${renderDocsHtml(docs, instaPng)}
+  ${renderDocsHtml(docs, instaPng, qr)}
 </div>
 
 </body>
@@ -1053,8 +1126,40 @@ function openPreviewTab(docs, instaPng) {
   w.document.close();
 }
 
-function renderDocsHtml({ rgPng, certPng, vacinaResult }, instaPng) {
+
+// function renderDocsHtml({ rgPng, certPng, vacinaResult }, instaPng) {
+//   let out = "";
+
+//   if (rgPng) out += docCard("RG do Pet", rgPng);
+//   if (certPng) out += docCard("Certidão de Nascimento", certPng);
+
+//   if (vacinaResult) {
+//     if (typeof vacinaResult === "object") {
+//       if (vacinaResult.frente) out += docCard("Carteira de Vacinação (Frente)", vacinaResult.frente);
+//       if (vacinaResult.verso) out += docCard("Carteira de Vacinação (Verso)", vacinaResult.verso);
+//     } else if (typeof vacinaResult === "string") {
+//       out += docCard("Carteira de Vacinação", vacinaResult);
+//     }
+//   }
+//   if (instaPng) out += docCard("Post para Instagram", instaPng);
+
+//   return out || `<div class="card"><p class="title">Nada para exibir</p></div>`;
+// }
+function renderDocsHtml({ rgPng, certPng, vacinaResult }, instaPng, qr) {
   let out = "";
+
+  // ✅ QR primeiro
+  if (qr?.qrPng) {
+    out += `
+      <div class="card">
+        <p class="title">QR Code do Registro ${qr.registro ? `(${qr.registro})` : ""}</p>
+        <div class="qrBox">
+          <img class="qrImg" src="${qr.qrPng}" alt="QR Code" />
+        </div>
+        ${qr.qrUrl ? `<div class="qrText">${qr.qrUrl}</div>` : ""}
+      </div>
+    `;
+  }
 
   if (rgPng) out += docCard("RG do Pet", rgPng);
   if (certPng) out += docCard("Certidão de Nascimento", certPng);
@@ -1067,10 +1172,12 @@ function renderDocsHtml({ rgPng, certPng, vacinaResult }, instaPng) {
       out += docCard("Carteira de Vacinação", vacinaResult);
     }
   }
+
   if (instaPng) out += docCard("Post para Instagram", instaPng);
 
   return out || `<div class="card"><p class="title">Nada para exibir</p></div>`;
 }
+
 
 function docCard(title, dataUrl) {
   const safeTitle = String(title).replace(/[&<>"']/g, (m) => ({

@@ -42,6 +42,22 @@ const publicDir = path.join(__dirname, "..", "..", "public");
 
 app.use(express.static(publicDir));
 
+// Rota "bonita" do QR: /SP-0001-001  ->  /?registro=SP-0001-001
+app.get("/:registro", (req, res, next) => {
+  const reg = (req.params.registro || "").toUpperCase().trim();
+
+  // Não capturar arquivos estáticos: /styles.css, /app.js, /favicon.ico, etc.
+  if (reg.includes(".")) return next();
+
+  // Só aceita o padrão UF-0000-000
+  const isRegistro = /^[A-Z]{2}-\d{4}-\d{3}$/.test(reg);
+  if (!isRegistro) return next();
+
+  return res.redirect(`/?registro=${encodeURIComponent(reg)}`);
+});
+
+
+
 /* =========================
    API routes
 ========================= */

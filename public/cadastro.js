@@ -1,4 +1,10 @@
 // public/cadastro.js
+import { generateRg } from "./admin/rg-generator.js";
+import { generateCertNascimento } from "./admin/cert-generator.js";
+import { generateVac } from "./admin/vac-generator.js";
+import { canvasesToSinglePdf } from "./pdf-export.js";
+
+
 const $ = (id) => document.getElementById(id);
 
 $("year").textContent = new Date().getFullYear();
@@ -216,68 +222,127 @@ async function apiCreatePublicWithPhoto(data, photoFile) {
 
   return json;
 }
+function getTemplatesByColor(color) {
+  const isRosa = String(color || "").toLowerCase().startsWith("r");
+  return {
+    rg: isRosa ? "./admin/img/rgRosa.png" : "./admin/img/rgAzul.png",
+    vacinaFront: isRosa ? "./admin/img/vacinaRosa.png" : "./admin/img/vacinaAzul.png",
+    vacinaBack: isRosa ? "./admin/img/vacinaVsRosa.png" : "./admin/img/vacinaVsAzul.png",
+  };
+}
+
+async function generateAndDownloadPdf(pet) {
+  const templates = getTemplatesByColor(pet.corDocumento);
+
+  // gera canvases
+  const rgCanvas = await generateRg(pet, templates.rg);
+  const certCanvas = await generateCertNascimento(pet, "./admin/img/certNasc.png");
+  const vacina = await generateVac(pet, templates.vacinaFront, templates.vacinaBack);
+
+  const pages = [];
+  if (rgCanvas) pages.push({ canvas: rgCanvas, preset: "rg" });
+  if (certCanvas) pages.push({ canvas: certCanvas, preset: "a4-portrait" });
+  if (vacina?.frente) pages.push({ canvas: vacina.frente, preset: "a4-landscape" });
+  if (vacina?.verso) pages.push({ canvas: vacina.verso, preset: "a4-landscape" });
+
+  const safeName = String(pet?.nomePet || "Pet").replace(/[^\w\-]+/g, "_");
+
+  canvasesToSinglePdf(pages, `PetDoc_${safeName}.pdf`, {
+    registro: pet.registro,
+    qrUrl: `https://petdocid.onrender.com/${encodeURIComponent(pet.registro || "")}`,
+  });
+}
 
 // ===== Submit =====
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // validação mínima
-  const required = ["cNomePet", "cEspecie", "cTutor1", "cTel1", "cCidade", "cEstado"];
-  for (const id of required) {
-    const el = $(id);
-    if (!String(el.value || "").trim()) {
-      setStatus("Preencha os campos obrigatórios antes de enviar.", "error");
-      el.focus();
-      return;
-    }
-  }
-
-  const photoFile = croppedFile || fotoInput.files?.[0];
-  if (!photoFile) {
-    setStatus("Selecione uma foto do pet (e centralize).", "error");
-    fotoInput.focus();
-    return;
-  }
-
-  // monta payload igual o FORM do admin (schema)
-  const data = {
-    nomePet: $("cNomePet").value.trim(),
-    especie: $("cEspecie").value,
-    raca: $("cRaca").value.trim(),
-    pelagemCor: $("cPelagemCor").value.trim(),
-    dataNascimento: $("cDataNascimento").value.trim(),
-    sexo: $("cSexo").value,
-    porte: $("cPorte").value,
-    castrado: $("cCastrado").value,
-    pedigree: $("cPedigree").value,
-    cidade: $("cCidade").value.trim(),
-    estado: $("cEstado").value.trim().toUpperCase(),
-    tutor1: $("cTutor1").value.trim(),
-    tutor2: $("cTutor2").value.trim(),
-    tel1: $("cTel1").value.trim(),
-    tel2: $("cTel2").value.trim(),
-    microchip: $("cMicrochip").value.trim(),
-    instagramPet: $("cInstagram").value.trim(),
-    observacoes: $("cObservacoes").value.trim(),
-    email: $("cEmail").value.trim(),
-    corDocumento: $("cCor").value,
-    // opcional: marcar status pendente (se você adicionar no schema depois)
-    status: "Pendente",
-  };
+  const submitBtn = form.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
 
   try {
+    // 1) validação mínima
+    const required = ["cNomePet", "cEspecie", "cTutor1", "cTel1", "cCidade", "cEstado"];
+    for (const id of required) {
+      const el = $(id);
+      if (!String(el.value || "").trim()) {
+        setStatus("Preencha os campos obrigatórios antes de enviar.", "error");
+        el.focus();
+        return; // sai do submit, e o finally vai reabilitar o botão
+      }
+    }
+
+    // 2) foto (cropped ou original)
+    const photoFile = croppedFile || fotoInput.files?.[0];
+    if (!photoFile) {
+      setStatus("Selecione uma foto do pet (e centralize).", "error");
+      fotoInput.focus();
+      return;
+    }
+
+    // 3) monta payload
+    const data = {
+      nomePet: $("cNomePet").value.trim(),
+      especie: $("cEspecie").value,
+      raca: $("cRaca").value.trim(),
+      pelagemCor: $("cPelagemCor").value.trim(),
+      dataNascimento: $("cDataNascimento").value.trim(),
+      sexo: $("cSexo").value,
+      porte: $("cPorte").value,
+      castrado: $("cCastrado").value,
+      pedigree: $("cPedigree").value,
+      cidade: $("cCidade").value.trim(),
+      estado: $("cEstado").value.trim().toUpperCase(),
+      tutor1: $("cTutor1").value.trim(),
+      tutor2: $("cTutor2").value.trim(),
+      tel1: $("cTel1").value.trim(),
+      tel2: $("cTel2").value.trim(),
+      microchip: $("cMicrochip").value.trim(),
+      instagramPet: $("cInstagram").value.trim(),
+      observacoes: $("cObservacoes").value.trim(),
+      email: $("cEmail").value.trim(),
+      corDocumento: $("cCor").value,
+      status: "Pendente",
+    };
+
+    // 4) envia cadastro + foto
     setStatus("Enviando cadastro...", "");
     const created = await apiCreatePublicWithPhoto(data, photoFile);
 
-    setStatus(
-      `✅ Cadastro enviado! Registro: ${created.registro || "—"}\nSeu pedido ficará como Pendente até a geração dos documentos.`,
-      "ok"
-    );
+    // 5) monta dados p/ gerar docs
+    const registro = created?.registro || created?.pet?.registro || "";
+    const photoUrl =
+      created?.photoUrl || created?.pet?.photoUrl || created?.data?.photoUrl || "";
 
-    // se quiser limpar depois de enviar:
-    // form.reset(); fileName.textContent = "Nenhuma foto selecionada"; croppedFile=null;
+    const petForDocs = {
+      ...data,
+      ...created,
+      registro,
+      expedicao: new Date().toLocaleDateString("pt-BR"),
+      photoUrl,
+      fotoUrl: photoUrl,
+    };
+
+    if (!petForDocs.registro) {
+      throw new Error("Cadastro criado, mas não veio o registro para gerar o QR.");
+    }
+
+    // 6) gera e baixa PDF (sem preview)
+    setStatus("✅ Cadastro enviado! Gerando seu PDF agora...", "ok");
+    await generateAndDownloadPdf(petForDocs);
+
+    // 7) final
+    setStatus(`✅ Tudo certo! Seu PDF foi baixado.\nRegistro: ${petForDocs.registro}`, "ok");
+
+    // 8) limpa
+    form.reset();
+    fileName.textContent = "Nenhuma foto selecionada";
+    croppedFile = null;
+
   } catch (err) {
     console.error(err);
     setStatus(err.message || "Erro ao enviar cadastro.", "error");
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 });

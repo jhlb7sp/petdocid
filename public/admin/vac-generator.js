@@ -1,6 +1,18 @@
 // public/vac-generator.js
+let __weatherSundayLoaded = false;
+
+async function loadCanvasFontOnce() {
+  if (__weatherSundayLoaded) return;
+  const font = new FontFace("WeatherSunday", "url(/fonts/WeatherSunday-PersonalUse.otf)");
+  await font.load();
+  document.fonts.add(font);
+  __weatherSundayLoaded = true;
+}
 
 export async function generateVac(pet, frontTemplate, backTemplate) {
+  await loadCanvasFontOnce();
+  await document.fonts.load('72px "WeatherSunday"');
+
   const color = pet?.corDocumento || "Azul";
 
   const front =
@@ -101,7 +113,6 @@ async function generateVacBack(templateUrl) {
 /* =========================
    Assinatura (mesma fonte do RG)
 ========================= */
-
 async function drawVacSignature(ctx, pet) {
   const nome = getFirstName(pet?.nomePet);
   if (!nome) return;
@@ -116,12 +127,12 @@ async function drawVacSignature(ctx, pet) {
 
   ctx.save();
 
-  await ensureFontLoaded('72px "Weather Sunday - Personal Use"');
-
-  ctx.font = '72px "Weather Sunday - Personal Use", Verdana';
+  // ✅ fonte já está carregada pelo generateVac
+  ctx.font = '72px "WeatherSunday", Verdana';
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
 
+  // contorno branco (fica bonito em qualquer fundo)
   ctx.lineJoin = "round";
   ctx.miterLimit = 2;
   ctx.strokeStyle = "rgba(255,255,255,0.95)";
@@ -133,6 +144,7 @@ async function drawVacSignature(ctx, pet) {
 
   ctx.restore();
 }
+
 
 /* =========================
    Helpers

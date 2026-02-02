@@ -301,9 +301,12 @@
           <div class="miniCard">
             <div class="miniTitle">O que acontece depois?</div>
             <div class="miniDesc">
-              Seu pedido entra como <strong>Pendente</strong> no nosso painel. Assim que os documentos estiverem
-              prontos,
-              você recebe via WhatsApp.
+              Assim que você finalizar o cadastro, os documentos do seu pet serão baixados automaticamente, 
+              já com QR Code de identificação.
+              <br>
+              Caso tenha qualquer dúvida, pode nos chamar pelo Instagram no perfil <strong>@petdocid</strong>.
+              <br>
+              💜 Guarde os documentos com carinho — eles ajudam a localizar o tutor caso o pet se perca.
             </div>
           </div>
           <div class="miniCard">
@@ -358,8 +361,19 @@
 
   </main>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+  <!-- jsPDF (UMD) -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <!-- QR code generator (global qrcode()) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+
+  <!-- CropperJS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+
+  <!-- Seu código -->
   <script type="module" src="./cadastro.js"></script>
+
 
 </body>
 

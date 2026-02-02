@@ -1,5 +1,26 @@
 // public/rg-generator.js
+let __weatherSundayLoaded = false;
+
+async function loadWeatherSundayFontOnce() {
+  if (__weatherSundayLoaded) return;
+
+  // ✅ se o nome do arquivo tiver espaço, encode!
+  const url = "/fonts/WeatherSunday-PersonalUse.otf";
+  const font = new FontFace("WeatherSunday", `url(${url})`);
+
+  await font.load();
+  document.fonts.add(font);
+
+  // garante que o browser “reconheceu” antes do fillText
+  await document.fonts.load('90px "WeatherSunday"');
+
+  __weatherSundayLoaded = true;
+}
+
+
 export async function generateRg(pet, templateUrl = "./img/rgAzul.png") {
+  await loadWeatherSundayFontOnce();
+
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
@@ -63,22 +84,18 @@ async function drawFrontSignature(ctx, pet) {
   const assinatura = firstName(fullName);
   if (!assinatura) return;
 
-  // Ajuste fino de posição
   const centerX = 645;
   const y = 680;
 
-  // tenta carregar a fonte (precisa estar registrada via @font-face)
-  await ensureFontLoaded('90px "Weather Sunday - Personal Use"');
-
   ctx.save();
   ctx.fillStyle = "#000";
-  ctx.font = '90px "Weather Sunday - Personal Use", Verdana';
+  ctx.font = '90px "WeatherSunday", Verdana';
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
-
   ctx.fillText(assinatura, centerX, y);
   ctx.restore();
 }
+
 
 function firstName(fullName) {
   if (!fullName) return "";
