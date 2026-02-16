@@ -203,7 +203,7 @@ function getTemplatesByColor(color) {
   const isRosa = String(color || "").toLowerCase().startsWith("r");
 
   return {
-    rg: isRosa ? "./img/rgRosa.png" : "./img/rgAzul.png",
+    rg: isRosa ? "./img/rgRosa2.png" : "./img/rgAzul.png",
     vacinaFront: isRosa ? "./img/vacinaRosa.png" : "./img/vacinaAzul.png",
     vacinaBack: isRosa ? "./img/vacinaVsRosa.png" : "./img/vacinaVsAzul.png",
   };

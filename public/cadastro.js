@@ -225,7 +225,7 @@ async function apiCreatePublicWithPhoto(data, photoFile) {
 function getTemplatesByColor(color) {
   const isRosa = String(color || "").toLowerCase().startsWith("r");
   return {
-    rg: isRosa ? "./admin/img/rgRosa.png" : "./admin/img/rgAzul.png",
+    rg: isRosa ? "./admin/img/rgRosa2.png" : "./admin/img/rgAzul.png",
     vacinaFront: isRosa ? "./admin/img/vacinaRosa.png" : "./admin/img/vacinaAzul.png",
     vacinaBack: isRosa ? "./admin/img/vacinaVsRosa.png" : "./admin/img/vacinaVsAzul.png",
   };
